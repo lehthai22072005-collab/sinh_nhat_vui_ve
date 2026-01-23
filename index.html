@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Happy Birthday 💖</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+
+body{
+    height:100vh;
+    background:linear-gradient(120deg,#ffd6e8,#e7c6ff,#cdb4db);
+    overflow:hidden;
+    font-family:"Segoe UI",sans-serif;
+}
+
+.screen{
+    position:absolute;
+    width:100%;
+    height:100%;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    flex-direction:column;
+    transition:1s;
+}
+
+.hidden{opacity:0;pointer-events:none}
+
+.glow{
+    color:white;
+    text-shadow:0 0 25px #ff9ecd;
+}
+
+/* tap start */
+.start{
+    background:rgba(0,0,0,.35);
+    backdrop-filter:blur(6px);
+    cursor:pointer;
+}
+
+/* intro */
+.intro-text{
+    font-size:36px;
+    animation:intro 3s ease forwards;
+}
+@keyframes intro{
+    from{opacity:0;transform:scale(.8)}
+    to{opacity:1;transform:scale(1)}
+}
+
+/* tim bay */
+.heart{
+    position:fixed;
+    bottom:-20px;
+    font-size:20px;
+    animation:float 8s linear infinite;
+    opacity:.7;
+}
+@keyframes float{
+    to{transform:translateY(-120vh)}
+}
+
+/* gift */
+.gift{
+    width:170px;height:170px;
+    background:#ff7eb3;
+    border-radius:30px;
+    position:relative;
+    animation:spin 5s linear infinite;
+    cursor:pointer;
+}
+.lid{
+    position:absolute;
+    width:170px;height:45px;
+    background:#ff9ecd;
+    top:-45px;
+    border-radius:20px;
+    transform-origin:bottom;
+    transition:1s;
+}
+.gift.open .lid{
+    transform:rotateX(140deg);
+}
+@keyframes spin{
+    from{transform:rotateY(0)}
+    to{transform:rotateY(360deg)}
+}
+
+/* cake */
+.cake{
+    font-size:120px;
+    animation:bounce 1.5s infinite;
+}
+@keyframes bounce{
+    50%{transform:translateY(-25px)}
+}
+
+.text{
+    color:white;
+    font-size:22px;
+    margin-top:20px;
+    max-width:85%;
+    text-align:center;
+    min-height:200px;
+}
+
+canvas{
+    position:fixed;
+    top:0;left:0;
+    pointer-events:none;
+}
+</style>
+</head>
+
+<body>
+
+<canvas id="fire"></canvas>
+
+<!-- TAP TO START -->
+<div class="screen start" id="start">
+    <h1 class="glow">💖 Chạm để bắt đầu 🎵</h1>
+</div>
+
+<!-- INTRO -->
+<div class="screen hidden" id="intro">
+    <h1 class="intro-text glow">🌙 Có một điều nhỏ muốn nói…</h1>
+</div>
+
+<!-- GIFT -->
+<div class="screen hidden" id="giftScreen">
+    <div class="gift" id="gift">
+        <div class="lid"></div>
+    </div>
+    <p style="margin-top:25px;color:white;font-size:22px">
+        Open Gift 🎁
+    </p>
+</div>
+
+<!-- FINAL -->
+<div class="screen hidden" id="final">
+    <div class="cake">🎂</div>
+    <h1 class="glow">Happy Birthday 🎉</h1>
+    <div class="text" id="text"></div>
+</div>
+
+<!-- 🎵 MUSIC -->
+<audio id="music" src="birthday.mp3" loop></audio>
+
+<script>
+const music = document.getElementById("music");
+
+/* tap start */
+start.onclick = () => {
+    music.play();
+    start.classList.add("hidden");
+
+    setTimeout(()=>{
+        intro.classList.remove("hidden");
+    },300);
+
+    setTimeout(()=>{
+        intro.classList.add("hidden");
+        giftScreen.classList.remove("hidden");
+    },3500);
+};
+
+/* tim bay */
+setInterval(()=>{
+    const h=document.createElement("div");
+    h.className="heart";
+    h.innerHTML="💖";
+    h.style.left=Math.random()*100+"vw";
+    h.style.animationDuration=6+Math.random()*4+"s";
+    document.body.appendChild(h);
+    setTimeout(()=>h.remove(),10000);
+},400);
+
+/* open gift */
+gift.onclick = ()=>{
+    gift.classList.add("open");
+    setTimeout(()=>{
+        giftScreen.classList.add("hidden");
+        final.classList.remove("hidden");
+        typeText();
+        fireworks();
+    },1200);
+};
+
+/* text */
+const msg =
+`💖 Lê Thị Hồng Thắm 💖
+
+Chúc mừng sinh nhật tuổi 19 🎂
+
+Tuổi 19 — một tuổi thật đẹp 🌸
+Mong rằng bạn luôn mỉm cười 😌
+luôn được yêu thương 💕
+và gặp thật nhiều điều dịu dàng ✨
+
+🎉 Happy Birthday 🎉`;
+
+let i=0;
+function typeText(){
+    if(i<msg.length){
+        text.innerHTML += msg[i]==="\n"?"<br>":msg[i];
+        i++;
+        setTimeout(typeText,45);
+    }
+}
+
+/* fireworks */
+const canvas=document.getElementById("fire");
+const ctx=canvas.getContext("2d");
+canvas.width=innerWidth;
+canvas.height=innerHeight;
+
+let parts=[];
+const colors=["#ff4d6d","#ffd6e0","#cdb4db","#ffafcc","#fff"];
+
+function fireworks(){
+    setInterval(()=>{
+        const x=Math.random()*canvas.width;
+        const y=Math.random()*canvas.height/2;
+        for(let i=0;i<90;i++){
+            const a=i*Math.PI*2/90;
+            parts.push({
+                x,y,
+                vx:Math.cos(a)*Math.random()*5,
+                vy:Math.sin(a)*Math.random()*5,
+                life:80,
+                c:colors[Math.floor(Math.random()*colors.length)]
+            });
+        }
+    },650);
+}
+
+function animate(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    parts.forEach((p,i)=>{
+        ctx.fillStyle=p.c;
+        ctx.beginPath();
+        ctx.arc(p.x,p.y,2.5,0,Math.PI*2);
+        ctx.fill();
+        p.x+=p.vx;
+        p.y+=p.vy;
+        p.life--;
+        if(p.life<=0) parts.splice(i,1);
+    });
+    requestAnimationFrame(animate);
+}
+animate();
+</script>
+
+</body>
+</html>
